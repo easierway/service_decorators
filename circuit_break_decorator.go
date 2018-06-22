@@ -1,15 +1,15 @@
 package service_decorators
 
 import (
-	"fmt"
+	"errors"
 	"time"
 )
 
-//CircuitBreakTimeoutError happens when invoking is timeout
-var CircuitBreakTimeoutError error
+//ErrorCircuitBreakTimeout happens when invoking is timeout
+var ErrorCircuitBreakTimeout = errors.New("the invoking is timeout")
 
-//CircuitBreakTooManyConcurrentRequestsError happens when the number of the concurrent requests beyonds the setting
-var CircuitBreakTooManyConcurrentRequestsError error
+//ErrorCircuitBreakTooManyConcurrentRequests happens when the number of the concurrent requests beyonds the setting
+var ErrorCircuitBreakTooManyConcurrentRequests = errors.New("the concurrency is beyond the limit")
 
 //CircuitBreakDecoratorConfig includes the settings of CircuitBreakDecorator
 type CircuitBreakDecoratorConfig struct {
@@ -118,10 +118,7 @@ func (dec *CircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 				if dec.Config.beyondMaxConcurrencyFallbackFunction != nil {
 					return dec.Config.beyondMaxConcurrencyFallbackFunction(req)
 				}
-				CircuitBreakTooManyConcurrentRequestsError = fmt.
-					Errorf("The max current requests is %d",
-						dec.Config.maxCurrentRequests)
-				return nil, CircuitBreakTooManyConcurrentRequestsError
+				return nil, ErrorCircuitBreakTooManyConcurrentRequests
 			}
 			ownToken = true
 		}
@@ -143,10 +140,7 @@ func (dec *CircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 			if dec.Config.timeoutFallbackFunction != nil {
 				return dec.Config.timeoutFallbackFunction(req)
 			}
-			CircuitBreakTimeoutError = fmt.Errorf(
-				"Circuit break error-timeout! Timeout setting is %v",
-				dec.Config.timeout)
-			return nil, CircuitBreakTimeoutError
+			return nil, ErrorCircuitBreakTimeout
 		}
 
 	}

@@ -2,15 +2,14 @@ package service_decorators
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
-//RateLimitDecoratorConfigError occurred when the configurations are invalid
-var RateLimitDecoratorConfigError error
+//ErrorRateLimitDecoratorConfig occurred when the configurations are invalid
+var ErrorRateLimitDecoratorConfig = errors.New("rate limit configuration is wrong")
 
-//BeyondRateLimitError occurred when current request rate is beyond the limit
-var BeyondRateLimitError error = errors.New("current request rate is beyond the limit.")
+//ErrorBeyondRateLimit occurred when current request rate is beyond the limit
+var ErrorBeyondRateLimit = errors.New("current request rate is beyond the limit")
 
 //RateLimitDecorator provides the rate limit control
 //RateLimitDecoratorConfig is the rate limit Configurations
@@ -24,10 +23,7 @@ type RateLimitDecorator struct {
 //CreateRateLimitDecorator is to create a RateLimitDecorator
 func CreateRateLimitDecorator(interval time.Duration, numOfReqs int) (*RateLimitDecorator, error) {
 	if interval == 0 || numOfReqs <= 0 {
-		RateLimitDecoratorConfigError = fmt.Errorf(
-			"RateLimitDecorator configuration is invalid. interval (%v) numOfReqs (%d)",
-			interval, numOfReqs)
-		return nil, RateLimitDecoratorConfigError
+		return nil, ErrorRateLimitDecoratorConfig
 
 	}
 	bucket := make(chan struct{}, numOfReqs)
@@ -63,7 +59,7 @@ func (dec *RateLimitDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 	return func(req Request) (Response, error) {
 		if dec.numOfRequests > 0 {
 			if !dec.tryToGetToken() {
-				return nil, BeyondRateLimitError
+				return nil, ErrorBeyondRateLimit
 			}
 
 		}

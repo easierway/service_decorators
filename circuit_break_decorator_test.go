@@ -52,7 +52,7 @@ func TestCircuitBreakTimeoutCase(t *testing.T) {
 		Build()
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	_, err := decoratedFn(10)
-	if err != CircuitBreakTimeoutError {
+	if err != ErrorCircuitBreakTimeout {
 		t.Errorf("Unexpected error happened! %v", err)
 	}
 }
@@ -110,7 +110,7 @@ func TestCircuitBreakBeyondMaxConcurrentReqCase(t *testing.T) {
 				break
 			}
 		} else {
-			if fnRet.err == CircuitBreakTooManyConcurrentRequestsError {
+			if fnRet.err == ErrorCircuitBreakTooManyConcurrentRequests {
 				hasMaxCurError = true
 				break
 			}

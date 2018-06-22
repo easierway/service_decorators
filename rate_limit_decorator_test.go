@@ -36,7 +36,7 @@ func checkRateLimitDecorator(ratelimit RateLimitSetting, invokingInterval time.D
 	didRatelimitErrHappened := false
 	for j := 0; j < numOfReqs; j++ {
 		resp := <-respChan
-		if resp.err == BeyondRateLimitError {
+		if resp.err == ErrorBeyondRateLimit {
 			didRatelimitErrHappened = true
 		}
 	}

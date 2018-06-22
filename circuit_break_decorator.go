@@ -77,9 +77,12 @@ func (config *CircuitBreakDecoratorConfig) WithBeyondMaxConcurrencyFallbackFunct
 }
 
 //Build will create CircuitBreakDecorator with the settings defined by WithXX method chain
-func (config *CircuitBreakDecoratorConfig) Build() *CircuitBreakDecorator {
+func (config *CircuitBreakDecoratorConfig) Build() (*CircuitBreakDecorator, error) {
 	var tokenBuf chan struct{}
-	if config.maxCurrentRequests != 0 {
+	if config.maxCurrentRequests < 0 {
+		return nil, errors.New("invalid max current requests setting")
+	}
+	if config.maxCurrentRequests > 0 {
 		tokenBuf = make(chan struct{}, config.maxCurrentRequests)
 		for i := 0; i < config.maxCurrentRequests; i++ {
 			tokenBuf <- struct{}{}
@@ -88,7 +91,7 @@ func (config *CircuitBreakDecoratorConfig) Build() *CircuitBreakDecorator {
 	return &CircuitBreakDecorator{
 		Config:      config,
 		tokenBuffer: tokenBuf,
-	}
+	}, nil
 }
 
 func (dec *CircuitBreakDecorator) getToken() bool {

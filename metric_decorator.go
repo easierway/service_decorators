@@ -52,8 +52,8 @@ func (config *MetricDecoratorConfig) NeedsRecordingTimeSpent() *MetricDecoratorC
 }
 
 //Build is to create a CreateMetricDecorator instance according to the settings
-func (config *MetricDecoratorConfig) Build() *MetricDecorator {
-	return &MetricDecorator{config}
+func (config *MetricDecoratorConfig) Build() (*MetricDecorator, error) {
+	return &MetricDecorator{config}, nil
 }
 
 //Decorate is to add the metrics logic to the inner service function

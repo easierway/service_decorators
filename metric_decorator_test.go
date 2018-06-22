@@ -46,7 +46,8 @@ func checkInnerFunc(ret Response, err error, t *testing.T) {
 
 func TestMetricsWithTimeSpentRecords(t *testing.T) {
 	met := memoryMet{}
-	dec := CreateMetricDecorator(&met).NeedsRecordingTimeSpent().Build()
+	dec, err := CreateMetricDecorator(&met).NeedsRecordingTimeSpent().Build()
+	checkUnexpectedError(err, t)
 	decFn := dec.Decorate(MockServiceLongRunFn)
 	ret, err := decFn(10)
 	checkInnerFunc(ret, err, t)
@@ -63,9 +64,10 @@ func TestMetricsWithTimeSpentRecords(t *testing.T) {
 
 func TestMetricsWithErrorRecords(t *testing.T) {
 	met := memoryMet{}
-	dec := CreateMetricDecorator(&met).WithErrorClassifier(MockErrorClassifier).Build()
+	dec, err := CreateMetricDecorator(&met).WithErrorClassifier(MockErrorClassifier).Build()
+	checkUnexpectedError(err, t)
 	decFn := dec.Decorate(MockServiceFnWithErr)
-	_, err := decFn(10)
+	_, err = decFn(10)
 	if err == nil {
 		t.Error("An error is expected")
 		return
@@ -83,9 +85,10 @@ func TestMetricsWithErrorRecords(t *testing.T) {
 
 func TestMetricsWithoutAnyRecords(t *testing.T) {
 	met := memoryMet{}
-	dec := CreateMetricDecorator(&met).Build()
+	dec, err := CreateMetricDecorator(&met).Build()
+	checkUnexpectedError(err, t)
 	decFn := dec.Decorate(MockServiceFnWithErr)
-	_, err := decFn(10)
+	_, err = decFn(10)
 	if err == nil {
 		t.Error("An error is expected")
 		return

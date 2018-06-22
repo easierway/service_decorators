@@ -28,10 +28,11 @@ func MockFallbackFn(req Request) (Response, error) {
 }
 
 func TestCircuitBreakHappyCase(t *testing.T) {
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Second * 5).
 		WithMaxCurrentRequests(10).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceFn)
 	ret, err := decoratedFn(10)
 	if err != nil {
@@ -46,22 +47,24 @@ func TestCircuitBreakHappyCase(t *testing.T) {
 }
 
 func TestCircuitBreakTimeoutCase(t *testing.T) {
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Millisecond * 5).
 		WithMaxCurrentRequests(10).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
-	_, err := decoratedFn(10)
+	_, err = decoratedFn(10)
 	if err != ErrorCircuitBreakTimeout {
 		t.Errorf("Unexpected error happened! %v", err)
 	}
 }
 
 func TestCircuitBreakTimeoutCaseWithFallback(t *testing.T) {
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Millisecond * 5).
 		WithTimeoutFallbackFunction(MockFallbackFn).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	ret, err := decoratedFn(10)
 	if err != nil {
@@ -93,10 +96,11 @@ func callFnConcurrently(fn ServiceFunc, fnReq int,
 
 func TestCircuitBreakBeyondMaxConcurrentReqCase(t *testing.T) {
 	maxCurReqSetting := 10
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Millisecond * 1500).
 		WithMaxCurrentRequests(maxCurReqSetting).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	numOfGoroutines := maxCurReqSetting + 1
 	respChan := make(chan fnResponse, numOfGoroutines)
@@ -123,11 +127,12 @@ func TestCircuitBreakBeyondMaxConcurrentReqCase(t *testing.T) {
 
 func TestCircuitBreakBeyondMaxConcurrentReqCaseWithFallback(t *testing.T) {
 	maxCurReqSetting := 10
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithMaxCurrentRequests(maxCurReqSetting).
 		WithTimeout(time.Millisecond * 1500).
 		WithBeyondMaxConcurrencyFallbackFunction(MockFallbackFn).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	numOfGoroutines := maxCurReqSetting + 1
 	respChan := make(chan fnResponse, numOfGoroutines)
@@ -152,10 +157,11 @@ func TestCircuitBreakBeyondMaxConcurrentReqCaseWithFallback(t *testing.T) {
 
 func TestCircuitBreakInMaxConcurrentReqCase(t *testing.T) {
 	maxCurReqSetting := 10
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Second * 3).
 		WithMaxCurrentRequests(maxCurReqSetting).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	numOfGoroutines := maxCurReqSetting
 	respChan := make(chan fnResponse, numOfGoroutines)
@@ -177,10 +183,11 @@ func TestCircuitBreakInMaxConcurrentReqCase(t *testing.T) {
 
 func TestCircuitBreakInMaxConcurrentReqCaseForProperFequency(t *testing.T) {
 	maxCurReqSetting := 3
-	cbDec := CreateCircuitBreakDecorator().
+	cbDec, err := CreateCircuitBreakDecorator().
 		WithTimeout(time.Second * 2).
 		WithMaxCurrentRequests(maxCurReqSetting).
 		Build()
+	checkUnexpectedError(err, t)
 	decoratedFn := cbDec.Decorate(MockServiceLongRunFn)
 	numOfGoroutines := maxCurReqSetting + 1
 	respChan := make(chan fnResponse, numOfGoroutines)

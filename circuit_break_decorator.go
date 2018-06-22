@@ -21,11 +21,11 @@ type CircuitBreakDecoratorConfig struct {
 
 	//if TimeoutFallbackFunction is defined,
 	//it would be called when timeout error occurring
-	timeoutFallbackFunction ServiceFunc
+	timeoutFallbackFunction ServiceFallbackFunc
 
 	//if BeyondMaxConcurrencyFallbackFunction is defined,
 	//it would be called when concurrency beyonding error occurring
-	beyondMaxConcurrencyFallbackFunction ServiceFunc
+	beyondMaxConcurrencyFallbackFunction ServiceFallbackFunc
 }
 
 //CircuitBreakDecorator provides the circuit break,
@@ -64,14 +64,14 @@ func (config *CircuitBreakDecoratorConfig) WithMaxCurrentRequests(maxCurReq int)
 
 //WithTimeoutFallbackFunction sets the fallback method for timeout error
 func (config *CircuitBreakDecoratorConfig) WithTimeoutFallbackFunction(
-	fallbackFn ServiceFunc) *CircuitBreakDecoratorConfig {
+	fallbackFn ServiceFallbackFunc) *CircuitBreakDecoratorConfig {
 	config.timeoutFallbackFunction = fallbackFn
 	return config
 }
 
 //WithBeyondMaxConcurrencyFallbackFunction sets the fallback method for beyonding max concurrency error
 func (config *CircuitBreakDecoratorConfig) WithBeyondMaxConcurrencyFallbackFunction(
-	fallbackFn ServiceFunc) *CircuitBreakDecoratorConfig {
+	fallbackFn ServiceFallbackFunc) *CircuitBreakDecoratorConfig {
 	config.beyondMaxConcurrencyFallbackFunction = fallbackFn
 	return config
 }
@@ -119,7 +119,9 @@ func (dec *CircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 		if dec.Config.maxCurrentRequests > 0 {
 			if !dec.getToken() {
 				if dec.Config.beyondMaxConcurrencyFallbackFunction != nil {
-					return dec.Config.beyondMaxConcurrencyFallbackFunction(req)
+					return dec.Config.
+						beyondMaxConcurrencyFallbackFunction(req,
+							ErrorCircuitBreakTooManyConcurrentRequests)
 				}
 				return nil, ErrorCircuitBreakTooManyConcurrentRequests
 			}
@@ -141,7 +143,7 @@ func (dec *CircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 			return inServResp.resp, inServResp.err
 		case <-time.After(dec.Config.timeout):
 			if dec.Config.timeoutFallbackFunction != nil {
-				return dec.Config.timeoutFallbackFunction(req)
+				return dec.Config.timeoutFallbackFunction(req, ErrorCircuitBreakTimeout)
 			}
 			return nil, ErrorCircuitBreakTimeout
 		}

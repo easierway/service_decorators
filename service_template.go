@@ -19,6 +19,9 @@ type Response interface{}
 //To leverage the prebuilt decorators, the service function signature should follow it.
 type ServiceFunc func(req Request) (Response, error)
 
+//ServiceFallbackFunc is the fallback function definition
+type ServiceFallbackFunc func(req Request, err error) (Response, error)
+
 //Decorator is the interface of the decorators.
 type Decorator interface {
 	//Decorate function is to introdoce decorator's the functions

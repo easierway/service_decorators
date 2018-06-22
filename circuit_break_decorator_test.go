@@ -23,7 +23,7 @@ func MockServiceLongRunFn(req Request) (Response, error) {
 	return nil, errors.New("Not support input param")
 }
 
-func MockFallbackFn(req Request) (Response, error) {
+func MockFallbackFn(req Request, err error) (Response, error) {
 	return Response(-2), nil
 }
 

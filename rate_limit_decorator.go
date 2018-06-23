@@ -21,20 +21,22 @@ type RateLimitDecorator struct {
 }
 
 //CreateRateLimitDecorator is to create a RateLimitDecorator
-func CreateRateLimitDecorator(interval time.Duration, numOfReqs int) (*RateLimitDecorator, error) {
+func CreateRateLimitDecorator(interval time.Duration, numOfReqs int, bucketSize int) (*RateLimitDecorator, error) {
 	if interval == 0 || numOfReqs <= 0 {
 		return nil, ErrorRateLimitDecoratorConfig
 
 	}
-	bucket := make(chan struct{}, numOfReqs)
+	bucket := make(chan struct{}, bucketSize)
 	//fill the bucket firstly
-	for j := 0; j < numOfReqs; j++ {
+	for j := 0; j < bucketSize; j++ {
 		bucket <- struct{}{}
 	}
 	go func() {
 		for _ = range time.Tick(interval) {
 			for i := 0; i < numOfReqs; i++ {
 				bucket <- struct{}{}
+				sleepTime := interval / time.Duration(numOfReqs)
+				time.Sleep(time.Nanosecond * sleepTime)
 			}
 		}
 	}()

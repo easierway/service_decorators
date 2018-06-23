@@ -12,7 +12,7 @@ func checkErr(err error, t *testing.T) {
 }
 
 func TestRateLimitDecoratorHappyCase(t *testing.T) {
-	dec, err := CreateRateLimitDecorator(time.Second*1, 2)
+	dec, err := CreateRateLimitDecorator(time.Second*1, 2, 3)
 	checkErr(err, t)
 	decFn := dec.Decorate(MockServiceLongRunFn)
 	ret, err := decFn(10)
@@ -21,14 +21,15 @@ func TestRateLimitDecoratorHappyCase(t *testing.T) {
 }
 
 type RateLimitSetting struct {
-	numOfReqs int
-	invterval time.Duration
+	numOfReqs  int
+	invterval  time.Duration
+	bucketSize int
 }
 
 func checkRateLimitDecorator(ratelimit RateLimitSetting, invokingInterval time.Duration,
 	t *testing.T) bool {
 	numOfReqs := 5
-	dec, err := CreateRateLimitDecorator(ratelimit.invterval, ratelimit.numOfReqs)
+	dec, err := CreateRateLimitDecorator(ratelimit.invterval, ratelimit.numOfReqs, ratelimit.bucketSize)
 	checkErr(err, t)
 	decFn := dec.Decorate(MockServiceLongRunFn)
 	respChan := make(chan fnResponse, numOfReqs)
@@ -44,14 +45,14 @@ func checkRateLimitDecorator(ratelimit RateLimitSetting, invokingInterval time.D
 }
 
 func TestRateLimitDecoratorBeyondRateLimitCase(t *testing.T) {
-	if !checkRateLimitDecorator(RateLimitSetting{2, time.Second * 1},
+	if !checkRateLimitDecorator(RateLimitSetting{2, time.Second * 1, 2},
 		time.Millisecond*10, t) {
 		t.Error("Rate limit didn't work well!")
 	}
 }
 
 func TestRateLimitDecoratorInRateLimitCase(t *testing.T) {
-	if checkRateLimitDecorator(RateLimitSetting{20, time.Second * 1},
+	if checkRateLimitDecorator(RateLimitSetting{20, time.Second * 1, 20},
 		time.Millisecond*60, t) {
 		t.Error("Rate limit didn't work well!")
 	}

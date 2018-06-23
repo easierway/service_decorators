@@ -27,18 +27,19 @@ For example, the code section of rate limit
 
 ```Go
 ...
-bucket := make(chan struct{}, numOfReqs)
+bucket := make(chan struct{}, tokenBucketSize)
 //fill the bucket firstly
-for j := 0; j < numOfReqs; j++ {
-  bucket <- struct{}{}
+for j := 0; j < tokenBucketSize; j++ {
+	bucket <- struct{}{}
 }
-
 go func() {
-  for _ = range time.Tick(interval) {
-    for i := 0; i < numOfReqs; i++ {
-      bucket <- struct{}{}
-    }
-  }
+	for _ = range time.Tick(interval) {
+		for i := 0; i < numOfReqs; i++ {
+			bucket <- struct{}{}
+			sleepTime := interval / time.Duration(numOfReqs)
+			time.Sleep(time.Nanosecond * sleepTime)
+		}
+	}
 }()
 ...
 

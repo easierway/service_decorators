@@ -21,14 +21,14 @@ type RateLimitDecorator struct {
 }
 
 //CreateRateLimitDecorator is to create a RateLimitDecorator
-func CreateRateLimitDecorator(interval time.Duration, numOfReqs int, bucketSize int) (*RateLimitDecorator, error) {
+func CreateRateLimitDecorator(interval time.Duration, numOfReqs int, tokenBucketSize int) (*RateLimitDecorator, error) {
 	if interval == 0 || numOfReqs <= 0 {
 		return nil, ErrorRateLimitDecoratorConfig
 
 	}
-	bucket := make(chan struct{}, bucketSize)
+	bucket := make(chan struct{}, tokenBucketSize)
 	//fill the bucket firstly
-	for j := 0; j < bucketSize; j++ {
+	for j := 0; j < tokenBucketSize; j++ {
 		bucket <- struct{}{}
 	}
 	go func() {

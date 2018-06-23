@@ -19,7 +19,7 @@ server.Serve()
 ```
 As we all known, to build a robust and maintainable service is not an easy task. There are a lot of tricky work as the following:
 
-![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/other_functions.png)
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/other_functions.jpg)
 
 Most of them are much complicated than RPC, in some cases they are even complicated than your core business logic.
 
@@ -55,15 +55,15 @@ select {
 
 Just as the following diagram shows normally what you have to do is much more than what you want to do when implementing a microservice.
 
-![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/to_do.png)
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/to_do.jpg)
 
 The goal of the project is to reduce your work on what you have to do and let you only focus on what you want to do.
 
 All these common functions (e.g. rate limit, circuit break, metric) are encapsulated in the components, and these common logics can be injected in your service implementation transparently by leveraging decorator pattern.
 
-![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/decorator_pattern.png)
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/decorator_pattern.jpg)
 
-![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/decorators.png)
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/decorators.jpg)
 
 The following is an example of adding rate limit, circuit break and metrics functions with the prebuilt decorators.
 

@@ -89,3 +89,5 @@ if rateLimitDec, err = service_decorators.CreateRateLimitDecorator(time.Millisec
 	decFn := rateLimitDec.Decorate(circuitBreakDec.Decorate(metricDec.Decorate(innerFn)))
   ...
 ```
+
+Refer to the example: https://github.com/easierway/service_decorators_example/blob/master/example_service_test.go

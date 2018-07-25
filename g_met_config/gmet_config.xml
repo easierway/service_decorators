@@ -1,0 +1,15 @@
+<seelog type="asynctimer" asyncinterval="5000000" minlevel="trace" maxlevel="error">
+   <outputs formatid="common">
+
+   <buffered formatid="common" size="10000" flushperiod="1000">
+
+   <rollingfile type="date" filename="./test.log" datepattern="2006.02.01.15" fullname="true" maxrolls="30"/>
+
+   </buffered>
+
+   </outputs>
+
+    <formats>
+        <format id="common" format="%Msg%n" />
+    </formats>
+</seelog>

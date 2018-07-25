@@ -26,5 +26,6 @@ func (d *demoDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 		}
 		fmt.Printf("Demo deccorator exist\n")
 		return resp, err
+
 	}
 }

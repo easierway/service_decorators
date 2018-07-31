@@ -23,7 +23,7 @@ func TestRetryWhenRetriableErrorOccurred(t *testing.T) {
 	}
 	retryDec, err := CreateRetryDecorator(maxRetryTimes, time.Second*1, time.Second*1, retriableChecker)
 	checkErr(err, t)
-	decFn := retryDec.Decorator(connectionErrFn)
+	decFn := retryDec.Decorate(connectionErrFn)
 	res, decErr := decFn(1)
 	if decErr != ErrorConnection {
 		t.Error("The connection exception is expected.")
@@ -45,7 +45,7 @@ func TestRetryWhenRetriableErrorOccurredAndRecovered(t *testing.T) {
 	}
 	retryDec, err := CreateRetryDecorator(maxRetryTimes, time.Second*1, time.Second*1, retriableChecker)
 	checkErr(err, t)
-	decFn := retryDec.Decorator(connectionErrFn)
+	decFn := retryDec.Decorate(connectionErrFn)
 	res, decErr := decFn(1)
 	checkErr(decErr, t)
 	if res.(int) != 2 {
@@ -62,7 +62,7 @@ func TestRetryWithoutError(t *testing.T) {
 	}
 	retryDec, err := CreateRetryDecorator(maxRetryTimes, time.Second*1, time.Second*1, retriableChecker)
 	checkErr(err, t)
-	decFn := retryDec.Decorator(connectionErrFn)
+	decFn := retryDec.Decorate(connectionErrFn)
 	res, decErr := decFn(1)
 	checkErr(decErr, t)
 	if res.(int) != 1 {
@@ -79,7 +79,7 @@ func TestRetryWhenUnretriableErrorOccurred(t *testing.T) {
 	}
 	retryDec, err := CreateRetryDecorator(maxRetryTimes, time.Second*1, time.Second*1, retriableChecker)
 	checkErr(err, t)
-	decFn := retryDec.Decorator(connectionErrFn)
+	decFn := retryDec.Decorate(connectionErrFn)
 	res, decErr := decFn(1)
 	if decErr == nil || decErr == ErrorConnection {
 		t.Error("The error is not expected.")
@@ -95,7 +95,6 @@ func TestCreateDecorateWithInvalidSettings(t *testing.T) {
 	if err1 == nil {
 		t.Error("Setting error is expected")
 	}
-
 	_, err2 = CreateRetryDecorator(3, 0, time.Second*1, retriableChecker)
 	if err2 == nil {
 		t.Error("Setting error is expected")

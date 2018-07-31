@@ -35,7 +35,7 @@ func CreateRetryDecorator(maxRetryTimes int, retryInterval time.Duration,
 }
 
 // Decorator function is to add the retry logic to the decorated method
-func (dec *RetryDecorator) Decorator(innerFn ServiceFunc) ServiceFunc {
+func (dec *RetryDecorator) Decorate(innerFn ServiceFunc) ServiceFunc {
 	return func(req Request) (Response, error) {
 		var (
 			res Response

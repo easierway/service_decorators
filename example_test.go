@@ -57,7 +57,7 @@ func Example() {
 
 	// 2. decorate the encapsulted function with decorators
 	// be careful of the order of the decorators
-	decFn := circuitBreakDec.Decorate(metricDec.Decorate(retryDec.Decorator(encapsulatedFn)))
+	decFn := circuitBreakDec.Decorate(metricDec.Decorate(retryDec.Decorate(encapsulatedFn)))
 	ret, err := decFn(encapsulatedReq{1, 2})
 	fmt.Println(ret, err)
 	//Output: 3 <nil>

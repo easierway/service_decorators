@@ -59,7 +59,7 @@ func TestRateLimitDecoratorInRateLimitCase(t *testing.T) {
 }
 
 func TestTokenCreationFrequency(t *testing.T) {
-	dec, err := CreateRateLimitDecorator(time.Millisecond*9, 30, 30)
+	dec, err := CreateRateLimitDecorator(time.Second*9, 30000, 10)
 	checkErr(err, t)
 	cntToken := 0
 	go func() {
@@ -70,9 +70,9 @@ func TestTokenCreationFrequency(t *testing.T) {
 			}
 		}
 	}()
-	<-time.After(time.Millisecond * 35)
+	time.Sleep(time.Millisecond * 35)
 	t.Logf("Got %d tokens\n", cntToken)
-	if cntToken > 100 || cntToken < 80 {
+	if cntToken > 148 || cntToken < 80 {
 		t.Error("The frequency control didn't work well!")
 	}
 }

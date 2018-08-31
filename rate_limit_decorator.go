@@ -2,7 +2,6 @@ package service_decorators
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -32,7 +31,6 @@ func CreateRateLimitDecorator(interval time.Duration, numOfReqs int, tokenBucket
 	for j := 0; j < tokenBucketSize; j++ {
 		bucket <- struct{}{}
 	}
-	fmt.Printf("Put %v\n", time.Now())
 	go func() {
 		for _ = range time.Tick(interval / time.Duration(numOfReqs)) {
 			select {

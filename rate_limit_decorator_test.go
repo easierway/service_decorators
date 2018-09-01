@@ -70,7 +70,7 @@ func TestTokenCreationFrequency(t *testing.T) {
 			}
 		}
 	}()
-	time.Sleep(time.Millisecond * 35)
+	<-time.After(time.Millisecond * 35)
 	t.Logf("Got %d tokens\n", cntToken)
 	if cntToken > 148 || cntToken < 80 {
 		t.Error("The frequency control didn't work well!")

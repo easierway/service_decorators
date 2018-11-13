@@ -20,7 +20,7 @@ type RetryDecorator struct {
 // CreateRetryDecorator is to create RetryDecorator according to the settings
 // maxRetryTimes : max retry times
 // retryInterval, intervalIncrement : the sleep time before next retrying is  retryInterval + (retry times - 1) * intervalIncrement
-// retriableChecker : the function to check wether the error is retriable
+// retriableChecker : the function to check whether the error is retriable
 func CreateRetryDecorator(maxRetryTimes int, retryInterval time.Duration,
 	intervalIncrement time.Duration,
 	retriableChecker func(err error) bool) (*RetryDecorator, error) {

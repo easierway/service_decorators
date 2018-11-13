@@ -9,15 +9,15 @@ import (
 type ErrorDistinguisherFn func(err error) bool
 
 // AdvancedCircuitBreakDecorator is the advanced CircuitBeakDecorator,
-// which can support complex circuit break stragtegy.
+// which can support complex circuit break strategy.
 // For circuitBreak states transition, please refer to
 // https://github.com/easierway/service_decorators/blob/master/doc_pics/circuit_breaker_states_transtion.png
 //
 // 1. Failure frequency will cause circuit breaker state to open state
 // -- Failure frequency involves ErrorCount and ResetIntervalOfErrorCount
 //    They are used to count the errors occurred in the time window.
-// -- ErrorDistinguisher is to decide what kind of errors would be counted with ErrrorCounter.
-// -- ErrorCounter is to count the continous occurred errors in the time window
+// -- ErrorDistinguisher is to decide what kind of errors would be counted with ErrorCounter.
+// -- ErrorCounter is to count the continuous occurred errors in the time window
 // -- ResetIntervalOfErrorCount is the interval of resetting error counter to 0
 // 2. When circuit breaker is in open state, the requests will be processed
 //    by fallback function (FallbackFn)

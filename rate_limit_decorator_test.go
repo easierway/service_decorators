@@ -22,14 +22,14 @@ func TestRateLimitDecoratorHappyCase(t *testing.T) {
 
 type RateLimitSetting struct {
 	numOfReqs  int
-	invterval  time.Duration
+	interval  time.Duration
 	bucketSize int
 }
 
 func checkRateLimitDecorator(ratelimit RateLimitSetting, invokingInterval time.Duration,
 	t *testing.T) bool {
 	numOfReqs := 5
-	dec, err := CreateRateLimitDecorator(ratelimit.invterval, ratelimit.numOfReqs, ratelimit.bucketSize)
+	dec, err := CreateRateLimitDecorator(ratelimit.interval, ratelimit.numOfReqs, ratelimit.bucketSize)
 	checkErr(err, t)
 	decFn := dec.Decorate(MockServiceLongRunFn)
 	respChan := make(chan fnResponse, numOfReqs)

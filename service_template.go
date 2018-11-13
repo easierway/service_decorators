@@ -22,6 +22,6 @@ type ServiceFallbackFunc func(req Request, err error) (Response, error)
 
 // Decorator is the interface of the decorators.
 type Decorator interface {
-	// Decorate function is to introdoce decorator's the functions
+	// Decorate function is to introduce decorator's the functions
 	Decorate(ServiceFunc) ServiceFunc
 }

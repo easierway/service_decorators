@@ -149,3 +149,24 @@ func Example() {
 	//Output: 3 <nil>
 }
 ```
+## Decorators
+### Decorators List
+1. Rate Limit Decorator
+2. Circuit Break Decorator
+3. Advanced Circuit Break Decorator
+4. Metric Decorator
+5. Retry Decorator
+6. Chaos Engineering Decorator
+
+### ChaosEngineeringDecorator
+#### What is Chaos Engineering?
+According to the principles of chaos engineering, chaos engineering is “the discipline of experimenting on a distributed system in order to build confidence in the system’s capability to withstand turbulent conditions in production.”
+
+#### Why is Chaos Engineering?
+You learn how to fix the things that often break.  
+You don’t learn how to fix the things that rarely break.  
+If something hurts, do it more often!
+For today’s large scale distributed system, normally it is impossible to simulate all the cases (including the failure modes) in a nonproductive environment. Chaos engineering is about experimenting with continuous low level of breakage to make sure the system can handle the big things.
+
+#### What can ChaosEngineeringDecorator help in your chaos engineering practice?
+By ChaosEngineeringDecorator you can inject the failures (such as, slow response, error response) into the distributed system under control. This would help you to test and improve the resilience of your system. 

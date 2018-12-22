@@ -2,6 +2,7 @@ package service_decorators
 
 import (
 	"encoding/json"
+	"errors"
 	"math/rand"
 	"sync/atomic"
 	"time"
@@ -10,8 +11,8 @@ import (
 // ChaosEngineeringConfig is the configuration.
 type ChaosEngineeringConfig struct {
 	IsToInjectChaos        bool `json:"IsToInjectChaos"`        //Is it to start chaos injection, if it is false, all chaos injects (chaos function, slow response) will be stopped.
-	AdditionalResponseTime int  `json:"AdditionalResponseTime"` //Add additional time spent to simulate slow response.
-	ChaosRate              int  `json:"ChaosRate"`              //The proportion of the chaos response
+	AdditionalResponseTime int  `json:"AdditionalResponseTime"` //Inject additional time spent to simulate slow response.
+	ChaosRate              int  `json:"ChaosRate"`              //The proportion of the chaos response, the range is 0-100
 }
 
 // ChaosEngineeringDecorator is to inject the failure for Chaos Engineering
@@ -39,6 +40,13 @@ func getChaosConfigFromStorage(configStorage ConfigStorage,
 			AdditionalResponseTime: 0,
 			ChaosRate:              0,
 		}, err
+	}
+	if config.ChaosRate < 0 || config.ChaosRate > 100 {
+		return &ChaosEngineeringConfig{
+			IsToInjectChaos:        false,
+			AdditionalResponseTime: 0,
+			ChaosRate:              0,
+		}, errors.New("The value of ChaosRate should be in [0,100].")
 	}
 	return &config, nil
 }

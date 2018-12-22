@@ -169,4 +169,92 @@ If something hurts, do it more often!
 For today’s large scale distributed system, normally it is impossible to simulate all the cases (including the failure modes) in a nonproductive environment. Chaos engineering is about experimenting with continuous low level of breakage to make sure the system can handle the big things.
 
 #### What can ChaosEngineeringDecorator help in your chaos engineering practice?
-By ChaosEngineeringDecorator you can inject the failures (such as, slow response, error response) into the distributed system under control. This would help you to test and improve the resilience of your system. 
+By ChaosEngineeringDecorator you can inject the failures (such as, slow response, error response) into the distributed system under control. This would help you to test and improve the resilience of your system.
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/chaos_engineering_dec.png)
+
+#### How to ChaosEngineeringDecorator?
+##### Configurations
+The following is the configuration about ChaosEngineeringDecorator.
+```Javascript
+{
+	 "IsToInjectChaos" : true, // Is it to start chaos injection, if it is false, all chaos injects (chaos function, slow response) will be stopped
+	 "AdditionalResponseTime" : 500, // Inject additional time spent (milseconds) to simulate slow response.
+	 "ChaosRate" : 40 // The proportion of the chaos response, the range is 0-100
+ }
+ ```
+ The configuration is stored in the storage that can be accessed with ["ConfigStorage"](https://github.com/easierway/service_decorators/blob/master/config_storage.go#L6) interface.
+
+##### Inject Slow Response
+```Go
+// Example_ChaosEngineeringDecorator_InjectError is the example for slow response injection.
+// To run the example, put the following configuration into Consul KV storage with the key "ChaosExample"
+// {
+//   "IsToInjectChaos" : true,
+//   "AdditionalResponseTime" : 100, // response time will be increased 100ms
+//   "ChaosRate" : 10
+// }
+func Example_ChaosEngineeringDecorator_InjectSlowResponse() {
+	serviceFn := func(req Request) (Response, error) {
+		return "Service is invoked", nil
+	}
+	ErrorInjectionFn := func(req Request) (Response, error) {
+		return "Error Injection", errors.New("Failed to process.")
+	}
+	storage, err := CreateConsulConfigStorage(&api.Config{})
+	if err != nil {
+		fmt.Println("You might need to start Cousul server.", err)
+		return
+	}
+	chaosDec, err := CreateChaosEngineeringDecorator(storage, "ChaosExample",
+		ErrorInjectionFn, 10*time.Millisecond)
+	if err != nil {
+		fmt.Println("You might need to start Cousul server.", err)
+		return
+	}
+	decFn := chaosDec.Decorate(serviceFn)
+	for i := 0; i < 10; i++ {
+		tStart := time.Now()
+		ret, _ := decFn("")
+		fmt.Printf("Output is %s. Time escaped: %f ms\n", ret,
+			time.Since(tStart).Seconds()*1000)
+	}
+
+	//You have 10% probability to get slow response.
+
+}
+```
+##### Inject Error Response
+```Go
+// Example_ChaosEngineeringDecorator_InjectError is the example for error injection.
+// To run the example, put the following configuration into Consul KV storage with the key "ChaosExample"
+// {
+//   "IsToInjectChaos" : true,
+//   "AdditionalResponseTime" : 0,
+//   "ChaosRate" : 10
+// }
+func Example_ChaosEngineeringDecorator_InjectError() {
+	serviceFn := func(req Request) (Response, error) {
+		return "Service is invoked", nil
+	}
+	ErrorInjectionFn := func(req Request) (Response, error) {
+		return "Error Injection", errors.New("Failed to process.")
+	}
+	storage, err := CreateConsulConfigStorage(&api.Config{})
+	if err != nil {
+		fmt.Println("You might need to start Cousul server.", err)
+		return
+	}
+	chaosDec, err := CreateChaosEngineeringDecorator(storage, "ChaosExample",
+		ErrorInjectionFn, 10*time.Millisecond)
+	if err != nil {
+		fmt.Println("You might need to start Cousul server.", err)
+		return
+	}
+	decFn := chaosDec.Decorate(serviceFn)
+	for i := 0; i < 10; i++ {
+		ret, _ := decFn("")
+		fmt.Printf("Output is %s\n", ret)
+	}
+	//You have 10% probability to get "Error Injection"
+}
+```

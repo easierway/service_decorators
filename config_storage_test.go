@@ -24,6 +24,7 @@ func TestGetAndSetForConsul(t *testing.T) {
 	if err != nil {
 		if strings.Contains(err.Error(), "connection") {
 			t.Log("Warning: The failure is caused by Consul connection.")
+			return
 		} else {
 			t.Error(err)
 		}

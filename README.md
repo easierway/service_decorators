@@ -158,11 +158,34 @@ func Example() {
 5. Retry Decorator
 6. Chaos Engineering Decorator
 
+### CircuitBreakDecorator
+Circuit breaker is the key part fault tolerance and recovery oriented solution. Circuit breaker is to stop cascading failure and enable resilience in complex distributed systems where failure is inevitable.
+
+Stop cascading failures. Fallbacks and graceful degradation. Fail fast and rapid recovery.
+CircuitBreakDecorator would interrupt client invoking when its time spent being longer than the expectation. A timeout exception or the result coming from the degradation method will be return to client.
+The similar logic is also working for the concurrency limit.
+https://github.com/easierway/service_decorators_example/blob/master/example_service_test.go#L46
+
+### AdvancedCircuitBreakDecorator
+AdvancedCircuitBreakDecorator is a stateful circuit breaker. Not like CircuitBreakDecorator, which each client call will invoke the service function wrapped by the decorators finally, AdvancedCircuitBreakDecorator is rarely invoked the service function when it's in "OPEN" state. Refer to the following state flow.
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/circuit_breaker_states_transtion.png)
+
+To use AdvancedCircuitBreakDecorator to handle the timeout and max concurrency limit, the service will be decorated by both CircuitBreakDecorator and AdvancedCircuitBreakDecorator.
+
+Be careful:
+1 AdvancedCircuitBreakDecorator should be put out of CircuitBreakDecorator to get timeout or beyond max concurrency errors.
+2 To let AdvancedCircuitBreakDecorator catch the errors and process the faults, not setting the fallback methods for CircuitBreakDecorator.
+![image](https://github.com/easierway/service_decorators/blob/master/doc_pics/AdvancedCircuitBreakDecorator.png)
+
+####
+
+
+
 ### ChaosEngineeringDecorator
 #### What is Chaos Engineering?
 According to the principles of chaos engineering, chaos engineering is “the discipline of experimenting on a distributed system in order to build confidence in the system’s capability to withstand turbulent conditions in production.”
 
-#### Why is Chaos Engineering?
+#### Why Chaos Engineering?
 You learn how to fix the things that often break.  
 You don’t learn how to fix the things that rarely break.  
 If something hurts, do it more often!

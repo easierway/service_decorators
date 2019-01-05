@@ -61,7 +61,7 @@ func (dec *AdvancedCircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceF
 		durErr := now.Sub(dec.lastErrorOccuredTime)
 		durRetry := now.Sub(dec.lastBackendInvokingTime)
 		if durErr > dec.ResetIntervalOfErrorCounter {
-			dec.ErrorCounter = 0
+			atomic.StoreInt64(&dec.ErrorCounter, 0)
 		}
 		if durRetry < dec.BackendRetryInterval &&
 			atomic.LoadInt64(&dec.ErrorCounter) >= dec.ErrorFrequencyThreshold {
@@ -70,7 +70,7 @@ func (dec *AdvancedCircuitBreakDecorator) Decorate(innerFn ServiceFunc) ServiceF
 		ret, err := innerFn(req)
 		dec.lastBackendInvokingTime = now
 		if err == nil {
-			dec.ErrorCounter = 0
+			atomic.StoreInt64(&dec.ErrorCounter, 0)
 		} else {
 			if dec.ErrorDistinguisher(err) {
 				atomic.AddInt64(&dec.ErrorCounter, 1)
